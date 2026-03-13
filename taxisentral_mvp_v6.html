@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taxisentral Driver MVP v4</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+body{background:#b0b0b0;display:flex;justify-content:center;padding:20px;min-height:100vh;}
+
+/* DARK MODE */
+.phone.dark-mode { background:#111; }
+.phone.dark-mode .bottom-sheet,
+.phone.dark-mode .bottom-nav,
+.phone.dark-mode #screen-home { background:#111; }
+.phone.dark-mode .driver-name,
+.phone.dark-mode .val-bold,
+.phone.dark-mode .trip-card-id,
+.phone.dark-mode .trip-card-amount { color:#fff; }
+.phone.dark-mode .driver-sub,
+.phone.dark-mode .shift-row,
+.phone.dark-mode .label-gray,
+.phone.dark-mode .nav-label,
+.phone.dark-mode .trip-card-time { color:#888; }
+.phone.dark-mode .shift-row { border-color:#333; }
+.phone.dark-mode .bottom-sheet { border-color:#333; }
+.phone.dark-mode .bottom-nav { border-color:#333; }
+.phone.dark-mode .nav-item.active .nav-label { color:#87ceeb; }
+.phone.dark-mode .page-content { background:#1a1a1a; }
+.phone.dark-mode .card,
+.phone.dark-mode .trip-card,
+.phone.dark-mode .shift-card,
+.phone.dark-mode .tool-card,
+.phone.dark-mode .msg-card,
+.phone.dark-mode .upcoming-card { background:#222; border-color:#333; }
+.phone.dark-mode .trip-card:hover,
+.phone.dark-mode .tool-card:hover { border-color:#87ceeb; }
+.phone.dark-mode .tool-name,
+.phone.dark-mode .msg-name,
+.phone.dark-mode .route-text,
+.phone.dark-mode .section-title { color:#ccc; }
+.phone.dark-mode .tool-desc,
+.phone.dark-mode .msg-preview,
+.phone.dark-mode .detail-label { color:#666; }
+.phone.dark-mode .receipt-scroll,
+.phone.dark-mode #screen-receipt { background:#111; }
+.phone.dark-mode .receipt-company { border-color:#333; }
+.phone.dark-mode .receipt-company-name { color:#fff; }
+.phone.dark-mode .receipt-table td { color:#ccc; border-color:#222; }
+.phone.dark-mode .receipt-table td:last-child { color:#fff; }
+.phone.dark-mode .receipt-section-header { background:#1a1a1a; border-color:#333; color:#888; }
+.phone.dark-mode .payment-body { background:#111; }
+.phone.dark-mode .payment-header { background:#111; border-color:#333; }
+.phone.dark-mode .tour-id-num { color:#fff; }
+.phone.dark-mode .pay-option { border-color:#333; background:#1a1a1a; }
+.phone.dark-mode .pay-option.selected { background:#1a2a00; border-color:#87ceeb; }
+.phone.dark-mode .pay-name { color:#ccc; }
+.phone.dark-mode .receipt-row { border-color:#333; color:#ccc; }
+.phone.dark-mode .meters { background:#1a1a1a; border-color:#333; }
+.phone.dark-mode .meter-val { color:#fff; }
+.phone.dark-mode .trip-info-card { background:#222; }
+.phone.dark-mode .trip-driver-name { color:#fff; }
+.phone.dark-mode .settings-card { background:#222; border-color:#333; }
+.phone.dark-mode .settings-row { border-color:#333; }
+.phone.dark-mode .settings-row:hover { background:#2a2a2a; }
+.phone.dark-mode .settings-row-text { color:#fff; }
+.phone.dark-mode .settings-row-sub,
+.phone.dark-mode .settings-arrow { color:#666; }
+.phone.dark-mode .settings-label { color:#666; }
+.phone.dark-mode .row-between { border-color:#333; }
+.phone.dark-mode .row-between span { color:#ccc; }
+.phone.dark-mode .income-bar-val { color:#aaa; }
+.phone.dark-mode .income-bar-bg { background:#333; }
+.phone.dark-mode .period-tab { background:#222; border-color:#333; color:#aaa; }
+.phone.dark-mode .period-tab.active { background:#87ceeb; border-color:#87ceeb; color:#111; }
+.phone.dark-mode .map-area { background:#1a2530; }
+.phone.dark-mode .chat-screen { background:#111; }
+.phone.dark-mode .chat-input-row { background:#1a1a1a; border-color:#333; }
+.phone.dark-mode .chat-input { background:#222; border-color:#333; color:#fff; }
+.phone.dark-mode .bubble-left { background:#222; border-color:#333; color:#fff; }
+.phone.dark-mode .menu-items .menu-item { border-color:#333; color:#ccc; }
+.phone.dark-mode .menu-item:hover { background:#1a1a00; }
+.phone.dark-mode .trip-details-row { border-color:#333; }
+.phone.dark-mode .detail-val { color:#ccc; }
+.phone.dark-mode .card-body .row-between span:last-child { color:#fff; }
+.phone{width:375px;background:#fff;border-radius:36px;border:6px solid #222;overflow:hidden;position:relative;box-shadow:0 24px 60px rgba(0,0,0,0.35);min-height:780px;display:flex;flex-direction:column;}
+.screen{display:none;flex-direction:column;flex:1;min-height:780px;}
+.screen.active{display:flex;}
+#side-menu{position:absolute;top:0;left:-285px;width:285px;height:100%;background:#fff;z-index:100;transition:left 0.25s ease;display:flex;flex-direction:column;}
+#side-menu.open{left:0;}
+#menu-backdrop{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:99;display:none;}
+#menu-backdrop.show{display:block;}
+.menu-header{background:#f5c518;padding:36px 20px 20px;}
+.menu-avatar{width:62px;height:62px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.menu-avatar svg{width:38px;height:38px;fill:#999;}
+.menu-name{font-size:17px;font-weight:600;color:#1a1a1a;}
+.menu-email{font-size:12px;color:#6a5500;margin-top:3px;}
+.menu-scroll{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.menu-items{padding:8px 0;}
+.menu-item{display:flex;align-items:center;gap:14px;padding:15px 20px;font-size:15px;color:#222;cursor:pointer;border-bottom:1px solid #f5f5f5;}
+.menu-item:hover{background:#fffbe6;}
+.menu-icon{width:24px;text-align:center;font-size:17px;}
+.menu-logout{color:#e24b4a;}
+.menu-version{padding:14px 20px;font-size:11px;color:#ccc;border-top:1px solid #f0f0f0;margin-top:auto;}
+.top-bar{background:#1a1a1a;padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.top-bar-title{color:#fff;font-size:15px;flex:1;font-weight:500;text-align:center;}
+.top-bar-back{color:#f5c518;font-size:18px;cursor:pointer;font-weight:500;background:none;border:none;}
+.top-bar-menu{width:32px;height:32px;display:flex;flex-direction:column;justify-content:center;gap:5px;cursor:pointer;padding:4px;}
+.top-bar-menu span{display:block;height:2px;background:#fff;border-radius:2px;}
+.tour-badge{background:#f5c518;color:#1a1a1a;font-size:13px;padding:4px 12px;border-radius:20px;font-weight:600;}
+.page-content{flex:1;overflow-y:auto;background:#f5f5f5;padding:12px;}
+.card{background:#fff;border-radius:14px;margin-bottom:10px;border:1px solid #eee;overflow:hidden;}
+.card-body{padding:16px;}
+.card-row{display:flex;justify-content:space-between;align-items:flex-start;}
+.label-gray{font-size:12px;color:#999;margin-top:3px;}
+.val-bold{font-size:16px;font-weight:600;color:#111;}
+.badge-yellow{background:#f5c518;color:#1a1a1a;font-size:12px;font-weight:600;padding:4px 12px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+.badge-green{background:#e6f9ef;color:#1a9e5c;font-size:12px;padding:4px 12px;border-radius:20px;font-weight:500;}
+.badge-gray{background:#f0f0f0;color:#666;font-size:12px;padding:4px 12px;border-radius:20px;}
+.badge-orange{background:#fff3e0;color:#e65100;font-size:12px;padding:4px 12px;border-radius:20px;font-weight:500;}
+.row-between{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f5f5;}
+.row-between:last-child{border-bottom:none;}
+.section-title{font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.8px;padding:8px 4px 6px;}
+.btn-yellow{width:100%;padding:16px;background:#f5c518;color:#1a1a1a;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;}
+.btn-outline{width:100%;padding:14px;border:1.5px solid #f5c518;background:#fff;color:#1a1a1a;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;}
+.toggle{width:46px;height:26px;background:#ddd;border-radius:13px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0;}
+.toggle.on{background:#f5c518;}
+.toggle::after{content:'';width:22px;height:22px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+.toggle.on::after{left:22px;}
+.bottom-nav{background:#fff;border-top:1px solid #eee;display:flex;padding:8px 0 12px;flex-shrink:0;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;}
+.nav-icon{font-size:20px;}
+.nav-label{font-size:10px;color:#999;}
+.nav-item.active .nav-label{color:#f5c518;font-weight:600;}
+/* LOGIN */
+#screen-login{background:#1a1a1a;align-items:center;justify-content:center;gap:18px;padding:60px 24px;}
+.logo-box{text-align:center;margin-bottom:8px;}
+.logo-box h1{color:#87ceeb;font-size:30px;font-weight:700;letter-spacing:2px;}
+#login-clock{color:#87ceeb;font-size:15px;letter-spacing:3px;margin-bottom:6px;font-weight:300;}
+.logo-box p{color:#888;font-size:13px;margin-top:6px;}
+.login-input{width:100%;padding:14px 16px;border-radius:10px;border:1px solid #444;background:#2a2a2a;color:#fff;font-size:15px;outline:none;}
+.login-input:focus{border-color:#f5c518;}
+.login-hint{color:#555;font-size:12px;text-align:center;}
+.forgot-link{color:#f5c518;font-size:13px;text-align:center;cursor:pointer;background:none;border:none;opacity:0.85;}
+.forgot-link:hover{opacity:1;text-decoration:underline;}
+/* HOME */
+#screen-home{background:#fff;}
+.map-area{flex:1;background:#dce8ee;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:280px;}
+.map-area svg.map-bg{position:absolute;top:0;left:0;width:100%;height:100%;}
+.driver-dot{width:30px;height:30px;background:#fff;border-radius:50%;border:2px solid #444;display:flex;align-items:center;justify-content:center;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+.driver-arrow{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:14px solid #1a1a1a;margin-top:-2px;}
+.bottom-sheet{background:#fff;padding:18px 20px 22px;border-top:1px solid #eee;flex-shrink:0;}
+.driver-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.driver-name{font-size:19px;font-weight:600;color:#111;}
+.driver-sub{font-size:13px;color:#999;margin-top:3px;}
+.shift-row{display:flex;justify-content:space-between;font-size:13px;color:#999;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid #f2f2f2;}
+.btn-start{width:100%;padding:17px;background:#f5c518;color:#1a1a1a;border:none;border-radius:14px;font-size:18px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;}
+.icon-box-dark{width:30px;height:30px;background:#1a1a1a;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.arrow-r{width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:11px solid #f5c518;}
+/* TRIP */
+#screen-trip{background:#fff;}
+.trip-map{flex:1;background:#d0dde5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;position:relative;overflow:hidden;min-height:220px;}
+.trip-map svg.map-bg{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0.4;}
+.trip-info-card{background:#fff;border-radius:14px;padding:12px 18px;z-index:2;min-width:210px;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
+.trip-driver-name{font-size:15px;font-weight:600;color:#111;}
+.trip-id-text{font-size:12px;color:#999;margin-top:2px;}
+.meters{background:#f7f7f7;padding:16px 10px;display:flex;justify-content:space-around;border-top:1px solid #eee;border-bottom:1px solid #eee;flex-shrink:0;}
+.meter-item{text-align:center;}
+.meter-val{font-size:28px;font-weight:600;color:#111;line-height:1;display:flex;align-items:center;justify-content:center;gap:4px;}
+.meter-label{font-size:11px;color:#999;margin-top:5px;letter-spacing:1.5px;}
+.flag-red{background:#e24b4a;color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;}
+.trip-bottom{padding:16px 20px 24px;flex-shrink:0;}
+.btn-red{width:100%;padding:17px;background:#e24b4a;color:#fff;border:none;border-radius:14px;font-size:17px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;}
+.icon-box-light{width:30px;height:30px;background:rgba(255,255,255,0.2);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.arrow-w{width:0;height:0;border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:11px solid #fff;}
+/* PAYMENT */
+#screen-payment{background:#fff;}
+.payment-header{padding:16px 20px;text-align:center;border-bottom:1px solid #f0f0f0;flex-shrink:0;}
+.tour-id-label{font-size:12px;color:#999;text-transform:uppercase;letter-spacing:1px;}
+.tour-id-num{font-size:30px;font-weight:600;color:#111;margin-top:4px;}
+.extra-bar{background:#1a1a1a;padding:12px 20px;color:#777;font-size:14px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.plus-circle{width:22px;height:22px;border:1px solid #555;border-radius:5px;display:flex;align-items:center;justify-content:center;color:#999;font-size:16px;}
+.payment-body{padding:16px 20px;overflow-y:auto;flex:1;}
+.payment-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.pay-option{border:1.5px solid #e0e0e0;border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.pay-option.selected{border-color:#f5c518;background:#fffdf0;}
+.pay-icon{font-size:22px;margin-bottom:6px;}
+.pay-name{font-size:13px;color:#333;font-weight:500;}
+.receipt-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid #f2f2f2;margin-bottom:14px;font-size:14px;color:#333;}
+/* SHIFTS */
+.shift-card{background:#fff;border-radius:14px;margin-bottom:10px;border:1px solid #eee;cursor:pointer;}
+.shift-card.active-shift{background:#1a1a1a;}
+.shift-card-body{padding:16px;}
+.shift-id-text{font-size:14px;font-weight:600;}
+.active-shift .shift-id-text,.active-shift .val-bold{color:#fff;}
+.active-shift .label-gray{color:#888;}
+.shift-trips-btn{background:#f5c518;color:#1a1a1a;font-size:12px;font-weight:600;padding:5px 10px;border-radius:20px;display:flex;align-items:center;gap:5px;}
+.trips-count{background:#1a1a1a;color:#f5c518;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+.active-shift .trips-count{background:#f5c518;color:#1a1a1a;}
+/* HISTORY */
+.trip-card{background:#fff;border-radius:14px;margin-bottom:10px;padding:16px;cursor:pointer;border:1px solid #eee;}
+.trip-card:hover{border-color:#f5c518;}
+.trip-card-id{font-size:14px;font-weight:600;color:#111;}
+.trip-card-time{font-size:12px;color:#999;margin-top:3px;}
+.trip-card-amount{font-size:16px;font-weight:700;color:#111;margin-top:3px;}
+.trip-details-row{display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px solid #f5f5f5;}
+.detail-label{font-size:12px;color:#999;}
+.detail-val{font-size:13px;font-weight:600;color:#333;margin-top:1px;}
+/* RECEIPT */
+#screen-receipt{background:#fff;}
+.receipt-scroll{flex:1;overflow-y:auto;}
+.receipt-company{text-align:center;padding:18px 20px;border-bottom:1px solid #f0f0f0;}
+.receipt-company-name{font-size:17px;font-weight:600;color:#111;}
+.receipt-org{font-size:13px;color:#888;margin-top:3px;}
+.receipt-table{width:100%;border-collapse:collapse;}
+.receipt-table td{padding:9px 20px;font-size:14px;color:#333;border-bottom:1px solid #f8f8f8;}
+.receipt-table td:last-child{text-align:right;font-weight:500;color:#111;}
+.receipt-table td:first-child{color:#888;}
+.receipt-section-header{padding:8px 20px 4px;font-weight:600;font-size:13px;color:#555;background:#f9f9f9;border-top:1px solid #eee;border-bottom:1px solid #eee;}
+.receipt-actions{padding:14px 20px 24px;display:flex;gap:10px;flex-shrink:0;}
+.btn-outline-sm{flex:1;padding:13px;border:1.5px solid #f5c518;background:#fff;color:#1a1a1a;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-fill-sm{flex:1;padding:13px;border:none;background:#f5c518;color:#1a1a1a;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;}
+/* UPCOMING */
+.upcoming-card{background:#fff;border-radius:14px;margin-bottom:10px;border:1px solid #eee;overflow:hidden;}
+.upcoming-header{background:#f5c518;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;}
+.upcoming-time{font-size:14px;font-weight:600;color:#1a1a1a;}
+.upcoming-body{padding:14px 16px;}
+.route-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:8px;}
+.route-dot{width:10px;height:10px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.dot-green{background:#1a9e5c;}
+.dot-red{background:#e24b4a;}
+.route-line{width:2px;height:18px;background:#ddd;margin-left:4px;margin-top:2px;}
+.route-text{font-size:14px;color:#111;font-weight:500;}
+.upcoming-footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #f5f5f5;}
+.btn-accept{background:#f5c518;color:#1a1a1a;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-decline{background:#f5f5f5;color:#888;border:none;border-radius:10px;padding:8px 18px;font-size:13px;cursor:pointer;}
+/* TOOLS */
+.tool-card{background:#fff;border-radius:14px;margin-bottom:10px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;border:1px solid #eee;}
+.tool-card:hover{border-color:#f5c518;}
+.tool-icon{width:48px;height:48px;border-radius:12px;background:#fffbe6;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.tool-name{font-size:15px;font-weight:600;color:#111;}
+.tool-desc{font-size:12px;color:#999;margin-top:3px;}
+.tool-arrow{color:#ccc;font-size:18px;margin-left:auto;}
+/* INCOME */
+.income-summary{background:#1a1a1a;padding:24px 20px;margin-bottom:12px;border-radius:14px;}
+.income-period{font-size:13px;color:#888;margin-bottom:6px;}
+.income-total{font-size:34px;font-weight:700;color:#f5c518;}
+.income-sub{font-size:13px;color:#666;margin-top:4px;}
+.income-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#333;margin-top:16px;border-radius:10px;overflow:hidden;}
+.income-stat{background:#222;padding:12px;text-align:center;}
+.income-stat-val{font-size:16px;font-weight:600;color:#fff;}
+.income-stat-label{font-size:11px;color:#888;margin-top:3px;}
+.period-tabs{display:flex;gap:8px;padding:0 0 12px;}
+.period-tab{padding:7px 16px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid #e0e0e0;background:#fff;color:#555;}
+.period-tab.active{background:#f5c518;border-color:#f5c518;color:#1a1a1a;font-weight:600;}
+.income-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.income-bar-label{font-size:12px;color:#888;width:30px;text-align:right;}
+.income-bar-bg{flex:1;height:8px;background:#f0f0f0;border-radius:4px;overflow:hidden;}
+.income-bar-fill{height:100%;background:#f5c518;border-radius:4px;}
+.income-bar-val{font-size:12px;color:#555;font-weight:600;width:60px;text-align:right;}
+/* MESSAGES */
+.msg-card{background:#fff;border-radius:14px;margin-bottom:8px;padding:14px 16px;cursor:pointer;border:1px solid #eee;display:flex;gap:12px;align-items:flex-start;}
+.msg-card.unread{border-left:3px solid #f5c518;}
+.msg-avatar{width:40px;height:40px;border-radius:50%;background:#f5c518;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#1a1a1a;flex-shrink:0;}
+.msg-name{font-size:14px;font-weight:600;color:#111;}
+.msg-preview{font-size:13px;color:#888;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+.msg-time{font-size:11px;color:#ccc;flex-shrink:0;}
+.msg-unread-dot{width:8px;height:8px;background:#f5c518;border-radius:50%;margin-top:4px;flex-shrink:0;}
+.chat-screen{flex:1;display:flex;flex-direction:column;background:#f5f5f5;}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;}
+.chat-bubble{max-width:75%;padding:10px 14px;border-radius:16px;margin-bottom:4px;font-size:14px;line-height:1.5;}
+.bubble-left{background:#fff;color:#111;border-bottom-left-radius:4px;border:1px solid #eee;}
+.bubble-right{background:#f5c518;color:#1a1a1a;border-bottom-right-radius:4px;align-self:flex-end;}
+.chat-time{font-size:11px;color:#bbb;text-align:center;margin:6px 0;}
+.chat-input-row{display:flex;gap:8px;padding:12px 16px;background:#fff;border-top:1px solid #eee;flex-shrink:0;}
+.chat-input{flex:1;padding:10px 14px;border-radius:20px;border:1px solid #e0e0e0;font-size:14px;outline:none;}
+.chat-send{width:40px;height:40px;background:#f5c518;border:none;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0;}
+/* SETTINGS */
+.profile-banner{background:#1a1a1a;padding:24px 20px;display:flex;align-items:center;gap:16px;margin-bottom:12px;border-radius:14px;}
+.profile-avatar{width:60px;height:60px;background:#f5c518;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#1a1a1a;flex-shrink:0;}
+.profile-name{font-size:17px;font-weight:600;color:#fff;}
+.profile-id{font-size:13px;color:#888;margin-top:3px;}
+.profile-edit{background:#333;color:#f5c518;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;margin-top:6px;}
+.settings-group{margin-bottom:12px;}
+.settings-label{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.8px;padding:6px 4px;}
+.settings-card{background:#fff;border-radius:14px;border:1px solid #eee;overflow:hidden;}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #f5f5f5;cursor:pointer;}
+.settings-row:last-child{border-bottom:none;}
+.settings-row-left{display:flex;align-items:center;gap:12px;}
+.settings-row-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.settings-row-text{font-size:14px;color:#111;font-weight:500;}
+.settings-row-sub{font-size:12px;color:#999;margin-top:1px;}
+.settings-arrow{color:#ccc;font-size:14px;}
+/* RESET PASSWORD */
+#screen-reset-choose,#screen-reset-email,#screen-reset-phone,
+#screen-reset-email-code,#screen-reset-phone-code,#screen-reset-newpass{background:#1a1a1a;}
+.reset-top{padding:20px 20px 0;display:flex;align-items:center;}
+.reset-back{color:#f5c518;font-size:22px;cursor:pointer;background:none;border:none;}
+.reset-body{padding:28px 24px;display:flex;flex-direction:column;gap:16px;flex:1;}
+.reset-title{color:#fff;font-size:22px;font-weight:700;}
+.reset-subtitle{color:#666;font-size:14px;line-height:1.6;}
+.reset-option{border:1.5px solid #333;border-radius:16px;padding:20px;cursor:pointer;display:flex;align-items:center;gap:16px;transition:all 0.2s;}
+.reset-option:hover{border-color:#f5c518;background:#1e1e00;}
+.reset-option-icon{width:48px;height:48px;background:#2a2a2a;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.reset-option-title{color:#fff;font-size:15px;font-weight:600;}
+.reset-option-desc{color:#666;font-size:12px;margin-top:3px;}
+.reset-input{width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid #333;background:#222;color:#fff;font-size:15px;outline:none;}
+.reset-input:focus{border-color:#f5c518;}
+.code-row{display:flex;gap:10px;justify-content:center;}
+.code-box{width:52px;height:60px;border-radius:12px;border:1.5px solid #333;background:#222;color:#fff;font-size:24px;font-weight:700;text-align:center;outline:none;}
+.code-box:focus{border-color:#f5c518;}
+.resend-text{color:#666;font-size:13px;text-align:center;}
+.resend-link{color:#f5c518;cursor:pointer;text-decoration:underline;}
+.success-icon{width:72px;height:72px;background:#1a3a1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto;}
+.step-dots{display:flex;gap:6px;justify-content:center;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#333;}
+.step-dot.on{background:#f5c518;width:24px;border-radius:4px;}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- SIDE MENU -->
+<div id="side-menu">
+  <div class="menu-header">
+    <div class="menu-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg></div>
+    <div class="menu-name">Achilles Alizadeh</div>
+    <div class="menu-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6627050e0f0a0a0315480751535526010b070f0a4805090b">[email&#160;protected]</a></div>
+  </div>
+  <div class="menu-scroll">
+    <div class="menu-items">
+      <div class="menu-item" onclick="closeMenu();goTo('home')"><span class="menu-icon">🏠</span>Mitt skift</div>
+      <div class="menu-item" onclick="closeMenu();goTo('shifts')"><span class="menu-icon">📋</span>Skiftrapporter</div>
+      <div class="menu-item" onclick="closeMenu();goTo('history')"><span class="menu-icon">🕐</span>Tur historikk</div>
+      <div class="menu-item" onclick="closeMenu();goTo('kommende')"><span class="menu-icon">📅</span>Kommende turer</div>
+      <div class="menu-item" onclick="closeMenu();goTo('tildelte')"><span class="menu-icon">📦</span>Tildelte turer</div>
+      <div class="menu-item" onclick="closeMenu();goTo('verktoy')"><span class="menu-icon">🔧</span>Verktøy</div>
+      <div class="menu-item" onclick="closeMenu();goTo('inntekter')"><span class="menu-icon">💰</span>Mine Inntekter</div>
+      <div class="menu-item" onclick="closeMenu();goTo('meldinger')"><span class="menu-icon">💬</span>Meldinger <span style="background:#e24b4a;color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;margin-left:auto;">3</span></div>
+      <div class="menu-item" onclick="closeMenu();goTo('innstillinger')"><span class="menu-icon">⚙️</span>Innstillinger</div>
+    </div>
+    <div class="menu-version">Versjon 1.1.8</div>
+    <div class="menu-item menu-logout" onclick="goTo('login');closeMenu()"><span class="menu-icon">🔴</span>Koble fra</div>
+  </div>
+</div>
+<div id="menu-backdrop" onclick="closeMenu()"></div>
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen active">
+  <div class="logo-box">
+    <div id="login-clock">--:--:--</div>
+    <h1>BRORSENTRAL</h1>
+  </div>
+  <input class="login-input" type="text" placeholder="Driver ID" value="AK105"/>
+  <input class="login-input" type="password" placeholder="Password" value="12345678"/>
+  <button class="btn-yellow" style="background:#87ceeb;" onclick="goTo('home')">Sign In</button>
+  <button class="forgot-link" onclick="goTo('reset-choose')">Forgot your password?</button>
+  <p class="login-hint">Any credentials work for demo</p>
+</div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen">
+  <div class="top-bar">
+    <div class="top-bar-menu" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="top-bar-title">457</div>
+    <div style="color:#888;font-size:13px;">1/1 ›</div>
+  </div>
+  <div class="map-area">
+    <svg class="map-bg" viewBox="0 0 375 280" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="70" x2="375" y2="70" stroke="#888" stroke-width="1.5"/>
+      <line x1="0" y1="140" x2="375" y2="140" stroke="#888" stroke-width="1.5"/>
+      <line x1="0" y1="210" x2="375" y2="210" stroke="#888" stroke-width="1.5"/>
+      <line x1="75" y1="0" x2="75" y2="280" stroke="#888" stroke-width="1.5"/>
+      <line x1="175" y1="0" x2="175" y2="280" stroke="#888" stroke-width="1.5"/>
+      <line x1="275" y1="0" x2="275" y2="280" stroke="#888" stroke-width="1.5"/>
+      <path d="M 20 140 Q 100 100 175 125 Q 240 145 340 110" stroke="#666" stroke-width="3" fill="none"/>
+      <path d="M 75 0 Q 95 70 85 140 Q 75 210 105 280" stroke="#666" stroke-width="2.5" fill="none"/>
+    </svg>
+    <div class="driver-dot"><div class="driver-arrow"></div></div>
+  </div>
+  <div class="bottom-sheet">
+    <div class="driver-row">
+      <div><div class="driver-name">Achilles Alizadeh</div><div class="driver-sub">AK105 · <span id="home-clock">--:--</span></div></div>
+      <div class="badge-green" style="display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;background:#1a9e5c;border-radius:50%;display:inline-block;"></span>Pålogget</div>
+    </div>
+    <div class="shift-row">
+      <span>Skift <strong style="color:#111">#474</strong></span>
+      <span>Inntjening: <strong style="color:#111" id="home-earnings">NOK 1364.0</strong></span>
+    </div>
+    <button class="btn-start" onclick="startTrip()">
+      <div class="icon-box-dark"><div class="arrow-r"></div></div>Start
+    </button>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="goTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Hjem</div></div>
+    <div class="nav-item" onclick="goTo('shifts')"><div class="nav-icon">📋</div><div class="nav-label">Skift</div></div>
+    <div class="nav-item" onclick="goTo('history')"><div class="nav-icon">🕐</div><div class="nav-label">Turer</div></div>
+    <div class="nav-item" onclick="openMenu()"><div class="nav-icon">☰</div><div class="nav-label">Meny</div></div>
+  </div>
+</div>
+
+<!-- ACTIVE TRIP -->
+<div id="screen-trip" class="screen">
+  <div class="top-bar"><div class="top-bar-title">Tur ID</div><div class="tour-badge" id="trip-badge">3620058</div></div>
+  <div class="trip-map">
+    <svg class="map-bg" viewBox="0 0 375 220" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="55" x2="375" y2="55" stroke="#999" stroke-width="1.5"/>
+      <line x1="0" y1="110" x2="375" y2="110" stroke="#999" stroke-width="1.5"/>
+      <line x1="0" y1="165" x2="375" y2="165" stroke="#999" stroke-width="1.5"/>
+      <line x1="90" y1="0" x2="90" y2="220" stroke="#999" stroke-width="1.5"/>
+      <line x1="190" y1="0" x2="190" y2="220" stroke="#999" stroke-width="1.5"/>
+      <line x1="290" y1="0" x2="290" y2="220" stroke="#999" stroke-width="1.5"/>
+      <path d="M 20 110 Q 90 75 190 95 Q 260 110 355 80" stroke="#444" stroke-width="3" fill="none"/>
+    </svg>
+    <div class="trip-info-card"><div class="trip-driver-name">Achilles Alizadeh</div><div class="trip-id-text" id="trip-id-label">Tur ID: 3620058</div></div>
+  </div>
+  <div class="meters">
+    <div class="meter-item"><div class="meter-val"><span id="m-nok">1</span></div><div class="meter-label">NOK</div></div>
+    <div class="meter-item"><div class="meter-val"><span id="m-km">0.0</span><span class="flag-red">F</span></div><div class="meter-label">KM</div></div>
+    <div class="meter-item"><div class="meter-val"><span id="m-min">00</span>:<span id="m-sec">00</span></div><div class="meter-label">TID</div></div>
+  </div>
+  <div class="trip-bottom">
+    <button class="btn-red" onclick="endTrip()"><div class="icon-box-light"><div class="arrow-w"></div></div>Stopp</button>
+  </div>
+</div>
+
+<!-- PAYMENT -->
+<div id="screen-payment" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">FORTSETT</button></div>
+  <div class="payment-header"><div class="tour-id-label">Tour ID#</div><div class="tour-id-num" id="pay-tour-id">3620058</div></div>
+  <div class="extra-bar"><div class="plus-circle">+</div>Ekstra</div>
+  <div class="payment-body">
+    <div class="section-title">Betalingsalternativer</div>
+    <div class="payment-grid">
+      <div class="pay-option" onclick="selectPay(this)"><div class="pay-icon">💳</div><div class="pay-name">Credit Card</div></div>
+      <div class="pay-option" onclick="selectPay(this)"><div class="pay-icon">💵</div><div class="pay-name">Cash</div></div>
+      <div class="pay-option selected" onclick="selectPay(this)"><div class="pay-icon">🧾</div><div class="pay-name">General Credit</div></div>
+      <div class="pay-option" onclick="selectPay(this)"><div class="pay-icon">✕</div><div class="pay-name">Wasted Trip</div></div>
+    </div>
+    <div class="receipt-row"><span>Skriv ut kvittering</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+    <button class="btn-yellow" onclick="completeTrip()">Avslutt Tur</button>
+  </div>
+</div>
+
+<!-- SHIFTS -->
+<div id="screen-shifts" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">←</button><div class="top-bar-title">Skiftrapporter</div></div>
+  <div class="page-content" id="shifts-list"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="goTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Hjem</div></div>
+    <div class="nav-item active"><div class="nav-icon">📋</div><div class="nav-label">Skift</div></div>
+    <div class="nav-item" onclick="goTo('history')"><div class="nav-icon">🕐</div><div class="nav-label">Turer</div></div>
+    <div class="nav-item" onclick="openMenu()"><div class="nav-icon">☰</div><div class="nav-label">Meny</div></div>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div id="screen-history" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">←</button><div class="top-bar-title">Tur historikk</div></div>
+  <div class="page-content" id="trips-list"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="goTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Hjem</div></div>
+    <div class="nav-item" onclick="goTo('shifts')"><div class="nav-icon">📋</div><div class="nav-label">Skift</div></div>
+    <div class="nav-item active"><div class="nav-icon">🕐</div><div class="nav-label">Turer</div></div>
+    <div class="nav-item" onclick="openMenu()"><div class="nav-icon">☰</div><div class="nav-label">Meny</div></div>
+  </div>
+</div>
+
+<!-- RECEIPT -->
+<div id="screen-receipt" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('history')">←</button><div class="top-bar-title" id="receipt-title">Tur #</div><span style="color:#f5c518;font-size:18px;">🖨</span></div>
+  <div class="receipt-scroll">
+    <div class="receipt-company"><div class="receipt-company-name">Mytaxi AS</div><div class="receipt-org">Org. nr 918 873 732</div></div>
+    <table class="receipt-table" id="receipt-table"></table>
+    <div class="receipt-actions"><button class="btn-outline-sm" onclick="goTo('history')">Tilbake</button><button class="btn-fill-sm">Send kvittering</button></div>
+  </div>
+</div>
+
+<!-- KOMMENDE -->
+<div id="screen-kommende" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">←</button><div class="top-bar-title">Kommende turer</div></div>
+  <div class="page-content" id="kommende-list"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="goTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Hjem</div></div>
+    <div class="nav-item" onclick="goTo('shifts')"><div class="nav-icon">📋</div><div class="nav-label">Skift</div></div>
+    <div class="nav-item" onclick="goTo('history')"><div class="nav-icon">🕐</div><div class="nav-label">Turer</div></div>
+    <div class="nav-item" onclick="openMenu()"><div class="nav-icon">☰</div><div class="nav-label">Meny</div></div>
+  </div>
+</div>
+
+<!-- TILDELTE -->
+<div id="screen-tildelte" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">←</button><div class="top-bar-title">Tildelte turer</div></div>
+  <div class="page-content" id="tildelte-list"></div>
+  <div class="bottom-nav">
+    <div class="nav-item" onclick="goTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Hjem</div></div>
+    <div class="nav-item" onclick="goTo('shifts')"><div class="nav-icon">📋</div><div class="nav-label">Skift</div></div>
+    <div class="nav-item" onclick="goTo('history')"><div class="nav-icon">🕐</div><div class="nav-label">Turer</div></div>
+    <div class="nav-item" onclick="openMenu()"><div class="nav-icon">☰</div><div class="nav-label">Meny</div></div>
+  </div>
+</div>
+
+<!-- VERKTOY -->
+<div id="screen-verktoy" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">←</button><div class="top-bar-title">Verktøy</div></div>
+  <div class="page-content">
+    <div class="section-title">Tilgjengelige verktøy</div>
+    <div class="tool-card"><div class="tool-icon">💰</div><div><div class="tool-name">Fast pris</div><div class="tool-desc">Angi fast pris for en tur</div></div><div class="tool-arrow">›</div></div>
+    <div class="tool-card"><div class="tool-icon">🗺️</div><div><div class="tool-name">Rute navigator</div><div class="tool-desc">Finn beste rute til destinasjon</div></div><div class="tool-arrow">›</div></div>
+    <div class="tool-card"><div class="tool-icon">🖨️</div><div><div class="tool-name">Skriv ut kvittering</div><div class="tool-desc">Koble til Bluetooth printer</div></div><div class="tool-arrow">›</div></div>
+    <div class="tool-card"><div class="tool-icon">💳</div><div><div class="tool-name">Betalingsterminal</div><div class="tool-desc">Administrer kortbetaling</div></div><div class="tool-arrow">›</div></div>
+    <div class="tool-card"><div class="tool-icon">💡</div><div><div class="tool-name">Taklys kontroll</div><div class="tool-desc">Slå taklys av/på</div></div><div class="tool-arrow">›</div></div>
+    <div class="tool-card"><div class="tool-icon">📊</div><div><div class="tool-name">Kjøre logg</div><div class="tool-desc">Se din daglige kjørestatistikk</div></div><div class="tool-arrow">›</div></div>
+  </div>
+</div>
+
+<!-- INNTEKTER -->
+<div id="screen-inntekter" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">←</button><div class="top-bar-title">Mine Inntekter</div></div>
+  <div class="page-content">
+    <div class="period-tabs">
+      <div class="period-tab active" onclick="switchPeriod(this,'Dag')">Dag</div>
+      <div class="period-tab" onclick="switchPeriod(this,'Uke')">Uke</div>
+      <div class="period-tab" onclick="switchPeriod(this,'Maaned')">Måned</div>
+    </div>
+    <div class="income-summary">
+      <div class="income-period" id="income-period-label">I dag — 13. mars 2026</div>
+      <div class="income-total" id="income-total">NOK 1,364</div>
+      <div class="income-sub" id="income-sub">8 turer · 9.3 timer på jobb</div>
+      <div class="income-stats">
+        <div class="income-stat"><div class="income-stat-val" id="stat-trips">8</div><div class="income-stat-label">Turer</div></div>
+        <div class="income-stat"><div class="income-stat-val" id="stat-km">62.4</div><div class="income-stat-label">KM</div></div>
+        <div class="income-stat"><div class="income-stat-val" id="stat-avg">NOK 171</div><div class="income-stat-label">Snitt/tur</div></div>
+      </div>
+    </div>
+    <div class="section-title">Inntjening per dag</div>
+    <div class="card" style="padding:14px 16px;" id="income-bars"></div>
+    <div class="section-title">Betalingstyper</div>
+    <div class="card"><div class="card-body">
+      <div class="row-between"><span style="font-size:14px;">General Credit</span><span style="font-weight:600;">NOK 617</span></div>
+      <div class="row-between"><span style="font-size:14px;">Credit Card</span><span style="font-weight:600;">NOK 396</span></div>
+      <div class="row-between"><span style="font-size:14px;">Cash</span><span style="font-weight:600;">NOK 351</span></div>
+    </div></div>
+  </div>
+</div>
+
+<!-- MELDINGER -->
+<div id="screen-meldinger" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">←</button><div class="top-bar-title">Meldinger</div></div>
+  <div class="page-content" id="msg-list"></div>
+</div>
+
+<!-- CHAT -->
+<div id="screen-chat" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('meldinger')">←</button><div class="top-bar-title" id="chat-title">Chat</div></div>
+  <div class="chat-screen">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" type="text" placeholder="Skriv melding..." onkeydown="if(event.key==='Enter')sendMsg()"/>
+      <button class="chat-send" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- INNSTILLINGER -->
+<div id="screen-innstillinger" class="screen">
+  <div class="top-bar"><button class="top-bar-back" onclick="goTo('home')">←</button><div class="top-bar-title">Innstillinger</div></div>
+  <div class="page-content">
+    <div class="profile-banner">
+      <div class="profile-avatar">AA</div>
+      <div><div class="profile-name">Achilles Alizadeh</div><div class="profile-id">AK105 · Sjåfør ID: 5291</div><button class="profile-edit">Rediger profil</button></div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-label">Konto</div>
+      <div class="settings-card">
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#fffbe6;">👤</div><div><div class="settings-row-text">Personlig informasjon</div><div class="settings-row-sub">Navn, telefon, e-post</div></div></div><span class="settings-arrow">›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#e6f9ef;">🪪</div><div><div class="settings-row-text">Dokumenter</div><div class="settings-row-sub">Lisens, forsikring, kontrakt</div></div></div><span class="settings-arrow">›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#e8f4fd;">🏦</div><div><div class="settings-row-text">Bankkonto</div><div class="settings-row-sub">Utbetalingsinformasjon</div></div></div><span class="settings-arrow">›</span></div>
+      </div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-label">App</div>
+      <div class="settings-card">
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#f0f0f0;">🔔</div><div><div class="settings-row-text">Varsler</div><div class="settings-row-sub">Push-varsler og lyder</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#f0f0f0;">🌙</div><div><div class="settings-row-text">Mørk modus</div></div></div><div class="toggle" id="dark-mode-toggle" onclick="toggleDarkMode()"></div></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#f0f0f0;">🌐</div><div><div class="settings-row-text">Språk</div><div class="settings-row-sub">Norsk</div></div></div><span class="settings-arrow">›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#f0f0f0;">📍</div><div><div class="settings-row-text">GPS og lokasjon</div><div class="settings-row-sub">Alltid aktiv</div></div></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-label">Enhet</div>
+      <div class="settings-card">
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#ffe8e8;">🔵</div><div><div class="settings-row-text">Bluetooth enheter</div><div class="settings-row-sub">Terminal, printer, taklys</div></div></div><span class="settings-arrow">›</span></div>
+        <div class="settings-row"><div class="settings-row-left"><div class="settings-row-icon" style="background:#f0f0f0;">📱</div><div><div class="settings-row-text">App versjon</div><div class="settings-row-sub">v1.1.8</div></div></div></div>
+      </div>
+    </div>
+    <button class="btn-yellow" onclick="goTo('login')">Logg ut</button>
+  </div>
+</div>
+
+<!-- RESET: CHOOSE -->
+<div id="screen-reset-choose" class="screen">
+  <div class="reset-top"><button class="reset-back" onclick="goTo('login')">←</button></div>
+  <div class="reset-body">
+    <div class="step-dots"><div class="step-dot on"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+    <div class="reset-title">Reset password</div>
+    <div class="reset-subtitle">Choose how you want to receive your verification code.</div>
+    <div class="reset-option" onclick="goTo('reset-email')">
+      <div class="reset-option-icon">✉️</div>
+      <div><div class="reset-option-title">Email</div><div class="reset-option-desc">Send code to your registered email</div></div>
+    </div>
+    <div class="reset-option" onclick="goTo('reset-phone')">
+      <div class="reset-option-icon">📱</div>
+      <div><div class="reset-option-title">Phone number</div><div class="reset-option-desc">Send SMS code to your phone</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESET: EMAIL -->
+<div id="screen-reset-email" class="screen">
+  <div class="reset-top"><button class="reset-back" onclick="goTo('reset-choose')">←</button></div>
+  <div class="reset-body">
+    <div class="step-dots"><div class="step-dot on"></div><div class="step-dot on"></div><div class="step-dot"></div></div>
+    <div class="reset-title">Enter your email</div>
+    <div class="reset-subtitle">We will send a 4-digit verification code to your email.</div>
+    <input class="reset-input" type="email" placeholder="your@email.com" id="reset-email-val"/>
+    <button class="btn-yellow" onclick="sendEmailCode()">Send code</button>
+  </div>
+</div>
+
+<!-- RESET: EMAIL CODE -->
+<div id="screen-reset-email-code" class="screen">
+  <div class="reset-top"><button class="reset-back" onclick="goTo('reset-email')">←</button></div>
+  <div class="reset-body">
+    <div class="step-dots"><div class="step-dot on"></div><div class="step-dot on"></div><div class="step-dot on"></div></div>
+    <div class="reset-title">Check your email</div>
+    <div class="reset-subtitle" id="email-sent-to">We sent a 4-digit code to your email.</div>
+    <div class="code-row">
+      <input class="code-box" type="text" maxlength="1" id="ec1" oninput="jumpNext(this,'ec2')"/>
+      <input class="code-box" type="text" maxlength="1" id="ec2" oninput="jumpNext(this,'ec3')"/>
+      <input class="code-box" type="text" maxlength="1" id="ec3" oninput="jumpNext(this,'ec4')"/>
+      <input class="code-box" type="text" maxlength="1" id="ec4"/>
+    </div>
+    <button class="btn-yellow" onclick="verifyCode('ec')">Verify code</button>
+    <div class="resend-text">Didn't get it? <span class="resend-link" onclick="alert('Code resent to your email!')">Resend code</span></div>
+  </div>
+</div>
+
+<!-- RESET: PHONE -->
+<div id="screen-reset-phone" class="screen">
+  <div class="reset-top"><button class="reset-back" onclick="goTo('reset-choose')">←</button></div>
+  <div class="reset-body">
+    <div class="step-dots"><div class="step-dot on"></div><div class="step-dot on"></div><div class="step-dot"></div></div>
+    <div class="reset-title">Enter your phone</div>
+    <div class="reset-subtitle">We will send a 4-digit SMS code to your number.</div>
+    <input class="reset-input" type="tel" placeholder="+47 000 00 000" id="reset-phone-val"/>
+    <button class="btn-yellow" onclick="sendPhoneCode()">Send SMS</button>
+  </div>
+</div>
+
+<!-- RESET: PHONE CODE -->
+<div id="screen-reset-phone-code" class="screen">
+  <div class="reset-top"><button class="reset-back" onclick="goTo('reset-phone')">←</button></div>
+  <div class="reset-body">
+    <div class="step-dots"><div class="step-dot on"></div><div class="step-dot on"></div><div class="step-dot on"></div></div>
+    <div class="reset-title">Check your SMS</div>
+    <div class="reset-subtitle" id="sms-sent-to">We sent a 4-digit code to your phone.</div>
+    <div class="code-row">
+      <input class="code-box" type="text" maxlength="1" id="pc1" oninput="jumpNext(this,'pc2')"/>
+      <input class="code-box" type="text" maxlength="1" id="pc2" oninput="jumpNext(this,'pc3')"/>
+      <input class="code-box" type="text" maxlength="1" id="pc3" oninput="jumpNext(this,'pc4')"/>
+      <input class="code-box" type="text" maxlength="1" id="pc4"/>
+    </div>
+    <button class="btn-yellow" onclick="verifyCode('pc')">Verify code</button>
+    <div class="resend-text">Didn't get it? <span class="resend-link" onclick="alert('SMS resent!')">Resend SMS</span></div>
+  </div>
+</div>
+
+<!-- RESET: NEW PASSWORD -->
+<div id="screen-reset-newpass" class="screen">
+  <div class="reset-top"><button class="reset-back" onclick="goTo('login')">←</button></div>
+  <div class="reset-body">
+    <div class="success-icon">✅</div>
+    <div class="reset-title" style="text-align:center;">Create new password</div>
+    <div class="reset-subtitle" style="text-align:center;">Code verified! Choose a strong new password.</div>
+    <input class="reset-input" type="password" placeholder="New password" id="new-pass-1"/>
+    <input class="reset-input" type="password" placeholder="Confirm new password" id="new-pass-2"/>
+    <button class="btn-yellow" onclick="saveNewPassword()">Save new password</button>
+  </div>
+</div>
+
+<script>
+var TRIPS=[
+  {id:3620343,time:'I dag 23:14',duration:'28 min',pay:'General Credit',amount:281,km:9.84,from:'Søndre gate 8, Oslo',to:'Øvre Prinsdals vei 51A, Oslo',start:'23:14',end:'23:43',loyve:'AK105',sjafId:5291,reg:'EE18846',vat:30,base:251},
+  {id:3620257,time:'I dag 22:47',duration:'13 min',pay:'General Credit',amount:236,km:7.2,from:'Karl Johans gate 1, Oslo',to:'Tøyen, Oslo',start:'22:47',end:'23:00',loyve:'AK105',sjafId:5291,reg:'EE18846',vat:28,base:208},
+  {id:3620237,time:'I dag 22:41',duration:'5 min',pay:'Cash',amount:109,km:2.1,from:'Oslo S',to:'Grønland, Oslo',start:'22:41',end:'22:46',loyve:'AK105',sjafId:5291,reg:'EE18846',vat:13,base:96},
+  {id:3620157,time:'I dag 22:18',duration:'17 min',pay:'General Credit',amount:132,km:5.5,from:'Majorstuen, Oslo',to:'Frogner, Oslo',start:'22:18',end:'22:35',loyve:'AK105',sjafId:5291,reg:'EE18846',vat:16,base:116},
+  {id:3620058,time:'I dag 21:46',duration:'22 min',pay:'Credit Card',amount:198,km:8.1,from:'Aker Brygge, Oslo',to:'Nordstrand, Oslo',start:'21:46',end:'22:08',loyve:'AK105',sjafId:5291,reg:'EE18846',vat:24,base:174}
+];
+var SHIFTS=[
+  {id:474,date:'I dag 09:24',status:'active',trips:8,earnings:1364},
+  {id:473,date:'I går 12:48 - 18:57',status:'done',trips:7,earnings:1182},
+  {id:472,date:'Lørdag 16:21 - 21:54',status:'done',trips:6,earnings:1196},
+  {id:471,date:'Lørdag 14:46 - 23:08',status:'done',trips:13,earnings:2056},
+  {id:470,date:'Fredag 08:00 - 16:30',status:'done',trips:10,earnings:1820}
+];
+var KOMMENDE=[
+  {id:'K001',time:'14:30',from:'Oslo Lufthavn',to:'Aker Brygge, Oslo',est:'NOK 420',distance:'48 km',passenger:'Maria Hansen'},
+  {id:'K002',time:'15:15',from:'Oslo S',to:'Holmenkollen, Oslo',est:'NOK 185',distance:'12 km',passenger:'Johan Berg'},
+  {id:'K003',time:'16:00',from:'Majorstuen',to:'Oslo Lufthavn',est:'NOK 390',distance:'45 km',passenger:'Sara Andersen'}
+];
+var TILDELTE=[
+  {id:'T001',time:'Nå',from:'Grønland, Oslo',to:'Frogner, Oslo',status:'Venter',est:'NOK 145',distance:'6.2 km'},
+  {id:'T002',time:'Om 20 min',from:'Nationaltheatret',to:'Majorstuen',status:'Planlagt',est:'NOK 98',distance:'3.8 km'}
+];
+var MESSAGES=[
+  {id:1,name:'Dispatch',avatar:'D',preview:'Din neste tur er klar. Hent ved Oslo S...',time:'14:32',unread:true,chat:[
+    {from:'them',text:'God dag Achilles! Din neste tur er klar.',time:'14:30'},
+    {from:'them',text:'Hent passasjer ved Oslo S, plattform 3.',time:'14:31'},
+    {from:'me',text:'Forstått, er på vei nå.',time:'14:32'}
+  ]},
+  {id:2,name:'Admin',avatar:'A',preview:'Husk å oppdatere kjøreloggen din for...',time:'11:00',unread:true,chat:[
+    {from:'them',text:'Husk å oppdatere kjøreloggen din for denne uken.',time:'11:00'}
+  ]},
+  {id:3,name:'Support',avatar:'S',preview:'Din henvendelse er mottatt...',time:'I går',unread:false,chat:[
+    {from:'me',text:'Hei, jeg har et spørsmål om betalingsterminalen.',time:'I går 09:00'},
+    {from:'them',text:'Din henvendelse er mottatt. Vi svarer snart.',time:'I går 09:05'},
+    {from:'them',text:'Problemet er løst. Prøv å restarte appen.',time:'I går 10:30'}
+  ]}
+];
+
+var timer=null,secs=0,km=0,nok=1,currentTourId=3620058,currentChat=null;
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('screen-'+id).classList.add('active');
+  if(id==='shifts') renderShifts();
+  if(id==='history') renderTrips();
+  if(id==='kommende') renderKommende();
+  if(id==='tildelte') renderTildelte();
+  if(id==='meldinger') renderMessages();
+  if(id==='inntekter') renderInntekter();
+}
+
+function openMenu(){
+  document.getElementById('side-menu').classList.add('open');
+  document.getElementById('menu-backdrop').classList.add('show');
+}
+function closeMenu(){
+  document.getElementById('side-menu').classList.remove('open');
+  document.getElementById('menu-backdrop').classList.remove('show');
+}
+
+function updateClock(){
+  var d=new Date();
+  var el=document.getElementById('home-clock');
+  if(el) el.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+  var lc=document.getElementById('login-clock');
+  if(lc) lc.textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+}
+updateClock();
+setInterval(updateClock,1000);
+
+function startTrip(){
+  currentTourId=3620000+Math.floor(Math.random()*999);
+  document.getElementById('trip-badge').textContent=currentTourId;
+  document.getElementById('trip-id-label').textContent='Tur ID: '+currentTourId;
+  document.getElementById('pay-tour-id').textContent=currentTourId;
+  secs=0; km=0; nok=1;
+  updateMeters();
+  goTo('trip');
+  if(timer) clearInterval(timer);
+  timer=setInterval(tick,1000);
+}
+function tick(){
+  secs++;
+  km=parseFloat((km+0.05).toFixed(1));
+  if(secs%10===0) nok=Math.round(nok+10);
+  updateMeters();
+}
+function updateMeters(){
+  document.getElementById('m-nok').textContent=nok;
+  document.getElementById('m-km').textContent=km.toFixed(1);
+  document.getElementById('m-min').textContent=String(Math.floor(secs/60)).padStart(2,'0');
+  document.getElementById('m-sec').textContent=String(secs%60).padStart(2,'0');
+}
+function endTrip(){
+  if(timer) clearInterval(timer);
+  timer=null;
+  goTo('payment');
+}
+function completeTrip(){
+  document.getElementById('home-earnings').textContent='NOK '+(1364+nok).toFixed(1);
+  goTo('home');
+}
+function selectPay(el){
+  document.querySelectorAll('.pay-option').forEach(function(o){o.classList.remove('selected');});
+  el.classList.add('selected');
+}
+
+function renderShifts(){
+  var html='';
+  for(var i=0;i<SHIFTS.length;i++){
+    var s=SHIFTS[i];
+    html+='<div class="shift-card '+(s.status==='active'?'active-shift':'')+'" onclick="goTo(\'history\')">';
+    html+='<div class="shift-card-body"><div class="card-row">';
+    html+='<div><div class="shift-id-text">ID# '+s.id+'</div><div class="label-gray">'+s.date+(s.status==='active'?' · Tilstede':'')+'</div></div>';
+    html+='<div class="shift-trips-btn">Turer <div class="trips-count">'+s.trips+'</div></div>';
+    html+='</div><div class="label-gray" style="margin-top:10px;">Inntjening</div>';
+    html+='<div class="val-bold">NOK '+s.earnings+'.0</div></div></div>';
+  }
+  document.getElementById('shifts-list').innerHTML=html;
+}
+
+function renderTrips(){
+  var html='';
+  for(var i=0;i<TRIPS.length;i++){
+    var t=TRIPS[i];
+    html+='<div class="trip-card" onclick="showReceipt('+t.id+')">';
+    html+='<div class="card-row"><div><div class="trip-card-id">ID# '+t.id+'</div><div class="trip-card-time">'+t.time+'</div></div>';
+    html+='<div style="text-align:right;"><div style="font-size:12px;color:#888;">'+t.pay+'</div><div class="trip-card-amount">NOK '+t.amount+'.0</div></div></div>';
+    html+='<div class="trip-details-row">';
+    html+='<div><div class="detail-label">Varighet</div><div class="detail-val">'+t.duration+'</div></div>';
+    html+='<div><div class="detail-label">Distanse</div><div class="detail-val">'+t.km+' km</div></div>';
+    html+='<div><div class="detail-label">Betaling</div><div class="detail-val">'+t.pay.split(' ')[0]+'</div></div>';
+    html+='</div></div>';
+  }
+  document.getElementById('trips-list').innerHTML=html;
+}
+
+function showReceipt(id){
+  var t=null;
+  for(var i=0;i<TRIPS.length;i++){if(TRIPS[i].id===id){t=TRIPS[i];break;}}
+  if(!t) return;
+  document.getElementById('receipt-title').textContent='Tur #'+t.id;
+  var html='';
+  html+='<tr><td>Dato</td><td>24.04.2025</td></tr>';
+  html+='<tr><td>Kvittering</td><td>'+t.id+'</td></tr>';
+  html+='<tr><td>Betalingstype</td><td>'+t.pay+'</td></tr>';
+  html+='<tr><td>Loyve Nr.</td><td>'+t.loyve+'</td></tr>';
+  html+='<tr><td>Fra</td><td>'+t.from+'</td></tr>';
+  html+='<tr><td>Til</td><td>'+t.to+'</td></tr>';
+  html+='<tr><td colspan="2" style="padding:0"><div class="receipt-section-header">Tur Info</div></td></tr>';
+  html+='<tr><td>Start</td><td>'+t.start+'</td></tr>';
+  html+='<tr><td>Slutt</td><td>'+t.end+'</td></tr>';
+  html+='<tr><td>Km tot</td><td>'+t.km+' km</td></tr>';
+  html+='<tr><td colspan="2" style="padding:0"><div class="receipt-section-header">Betaling</div></td></tr>';
+  html+='<tr><td>Beløp</td><td>NOK '+t.amount+'</td></tr>';
+  html+='<tr><td>VAT 12%</td><td>NOK '+t.vat+'</td></tr>';
+  html+='<tr><td>Grunnlag</td><td>NOK '+t.base+'</td></tr>';
+  html+='<tr><td colspan="2" style="padding:0"><div class="receipt-section-header">Taxi-Informasjon</div></td></tr>';
+  html+='<tr><td>Reg Nr.</td><td>'+t.reg+'</td></tr>';
+  html+='<tr><td>Org. nr</td><td>826809272MVA</td></tr>';
+  document.getElementById('receipt-table').innerHTML=html;
+  goTo('receipt');
+}
+
+function renderKommende(){
+  var html='<div class="section-title">'+KOMMENDE.length+' kommende turer</div>';
+  for(var i=0;i<KOMMENDE.length;i++){
+    var k=KOMMENDE[i];
+    html+='<div class="upcoming-card">';
+    html+='<div class="upcoming-header"><div class="upcoming-time">🕐 '+k.time+'</div><div class="badge-yellow">~'+k.est+'</div></div>';
+    html+='<div class="upcoming-body">';
+    html+='<div class="route-row"><div class="route-dot dot-green" style="margin-top:4px;flex-shrink:0;"></div><div style="margin-left:12px;"><div class="route-text">'+k.from+'</div></div></div>';
+    html+='<div style="padding-left:4px;margin:-2px 0 2px;"><div class="route-line"></div></div>';
+    html+='<div class="route-row"><div class="route-dot dot-red" style="margin-top:4px;flex-shrink:0;"></div><div style="margin-left:12px;"><div class="route-text">'+k.to+'</div></div></div>';
+    html+='<div class="upcoming-footer"><div><div style="font-size:12px;color:#999;">Passasjer</div><div style="font-size:14px;font-weight:600;color:#111;">'+k.passenger+'</div></div>';
+    html+='<div style="text-align:right;"><div style="font-size:12px;color:#999;">'+k.distance+'</div>';
+    html+='<div style="display:flex;gap:6px;margin-top:6px;"><button class="btn-decline" onclick="this.closest(\'.upcoming-card\').remove()">Avslå</button><button class="btn-accept">Aksepter</button></div></div></div>';
+    html+='</div></div>';
+  }
+  document.getElementById('kommende-list').innerHTML=html;
+}
+
+function renderTildelte(){
+  var html='<div class="section-title">'+TILDELTE.length+' tildelte turer</div>';
+  for(var i=0;i<TILDELTE.length;i++){
+    var t=TILDELTE[i];
+    var bg=t.status==='Venter'?'#1a1a1a':'#333';
+    html+='<div class="upcoming-card">';
+    html+='<div class="upcoming-header" style="background:'+bg+'"><div class="upcoming-time" style="color:#f5c518;">⚡ '+t.time+'</div>';
+    html+='<div class="badge-'+(t.status==='Venter'?'orange':'gray')+'">'+t.status+'</div></div>';
+    html+='<div class="upcoming-body">';
+    html+='<div class="route-row"><div class="route-dot dot-green" style="margin-top:4px;flex-shrink:0;"></div><div style="margin-left:12px;"><div class="route-text">'+t.from+'</div></div></div>';
+    html+='<div style="padding-left:4px;margin:-2px 0 2px;"><div class="route-line"></div></div>';
+    html+='<div class="route-row"><div class="route-dot dot-red" style="margin-top:4px;flex-shrink:0;"></div><div style="margin-left:12px;"><div class="route-text">'+t.to+'</div></div></div>';
+    html+='<div class="upcoming-footer"><div><div style="font-size:13px;font-weight:600;color:#111;">'+t.est+'</div><div style="font-size:12px;color:#999;">'+t.distance+'</div></div>';
+    html+='<button class="btn-accept" onclick="startTrip()">Start nå</button></div>';
+    html+='</div></div>';
+  }
+  document.getElementById('tildelte-list').innerHTML=html;
+}
+
+function renderMessages(){
+  var html='';
+  for(var i=0;i<MESSAGES.length;i++){
+    var m=MESSAGES[i];
+    html+='<div class="msg-card '+(m.unread?'unread':'')+'" onclick="openChat('+m.id+')">';
+    html+='<div class="msg-avatar">'+m.avatar+'</div>';
+    html+='<div style="flex:1;min-width:0;">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;">';
+    html+='<div class="msg-name">'+m.name+'</div><div class="msg-time">'+m.time+'</div></div>';
+    html+='<div class="msg-preview">'+m.preview+'</div></div>';
+    if(m.unread) html+='<div class="msg-unread-dot"></div>';
+    html+='</div>';
+  }
+  document.getElementById('msg-list').innerHTML=html;
+}
+
+function openChat(id){
+  var m=null;
+  for(var i=0;i<MESSAGES.length;i++){if(MESSAGES[i].id===id){m=MESSAGES[i];break;}}
+  if(!m) return;
+  m.unread=false;
+  currentChat=m;
+  document.getElementById('chat-title').textContent=m.name;
+  var el=document.getElementById('chat-messages');
+  var html='';
+  for(var i=0;i<m.chat.length;i++){
+    var c=m.chat[i];
+    html+='<div class="chat-time">'+c.time+'</div>';
+    html+='<div class="chat-bubble '+(c.from==='me'?'bubble-right':'bubble-left')+'">'+c.text+'</div>';
+  }
+  el.innerHTML=html;
+  goTo('chat');
+  setTimeout(function(){el.scrollTop=el.scrollHeight;},100);
+}
+
+function sendMsg(){
+  var input=document.getElementById('chat-input');
+  var text=input.value.trim();
+  if(!text||!currentChat) return;
+  currentChat.chat.push({from:'me',text:text,time:'Nå'});
+  input.value='';
+  openChat(currentChat.id);
+  setTimeout(function(){
+    currentChat.chat.push({from:'them',text:'Takk for meldingen! Vi svarer snart.',time:'Nå'});
+    openChat(currentChat.id);
+  },1200);
+}
+
+function renderInntekter(){
+  var days=[{d:'Man',v:980},{d:'Tir',v:1240},{d:'Ons',v:860},{d:'Tor',v:1580},{d:'Fre',v:2100},{d:'Lør',v:1820},{d:'Søn',v:1364}];
+  var max=0;
+  for(var i=0;i<days.length;i++){if(days[i].v>max)max=days[i].v;}
+  var html='';
+  for(var i=0;i<days.length;i++){
+    var d=days[i];
+    html+='<div class="income-bar-row">';
+    html+='<div class="income-bar-label">'+d.d+'</div>';
+    html+='<div class="income-bar-bg"><div class="income-bar-fill" style="width:'+Math.round(d.v/max*100)+'%"></div></div>';
+    html+='<div class="income-bar-val">NOK '+d.v+'</div></div>';
+  }
+  document.getElementById('income-bars').innerHTML=html;
+}
+
+function switchPeriod(el,period){
+  document.querySelectorAll('.period-tab').forEach(function(t){t.classList.remove('active');});
+  el.classList.add('active');
+  var data={
+    'Dag':{label:'I dag — 13. mars 2026',total:'NOK 1,364',sub:'8 turer · 9.3 timer',trips:8,km:'62.4',avg:'NOK 171'},
+    'Uke':{label:'Denne uken — mars 2026',total:'NOK 9,944',sub:'51 turer · 58 timer',trips:51,km:'428',avg:'NOK 195'},
+    'Maaned':{label:'Mars 2026',total:'NOK 38,200',sub:'196 turer · 214 timer',trips:196,km:'1,640',avg:'NOK 195'}
+  };
+  var d=data[period];
+  document.getElementById('income-period-label').textContent=d.label;
+  document.getElementById('income-total').textContent=d.total;
+  document.getElementById('income-sub').textContent=d.sub;
+  document.getElementById('stat-trips').textContent=d.trips;
+  document.getElementById('stat-km').textContent=d.km;
+  document.getElementById('stat-avg').textContent=d.avg;
+}
+
+function jumpNext(el,nextId){
+  if(el.value.length===1) document.getElementById(nextId).focus();
+}
+function sendEmailCode(){
+  var email=document.getElementById('reset-email-val').value.trim();
+  if(!email){alert('Please enter your email.');return;}
+  document.getElementById('email-sent-to').textContent='We sent a code to: '+email;
+  goTo('reset-email-code');
+  setTimeout(function(){document.getElementById('ec1').focus();},300);
+}
+function sendPhoneCode(){
+  var phone=document.getElementById('reset-phone-val').value.trim();
+  if(!phone){alert('Please enter your phone number.');return;}
+  document.getElementById('sms-sent-to').textContent='We sent a code to: '+phone;
+  goTo('reset-phone-code');
+  setTimeout(function(){document.getElementById('pc1').focus();},300);
+}
+function verifyCode(prefix){
+  var code='';
+  for(var i=1;i<=4;i++) code+=document.getElementById(prefix+i).value;
+  if(code.length<4){alert('Please enter the full 4-digit code.');return;}
+  goTo('reset-newpass');
+}
+function toggleDarkMode(){
+  var phone = document.querySelector('.phone');
+  var toggle = document.getElementById('dark-mode-toggle');
+  var isDark = phone.classList.toggle('dark-mode');
+  toggle.classList.toggle('on', isDark);
+  // Also update the moon icon background to reflect state
+  var icon = toggle.closest('.settings-row').querySelector('.settings-row-icon');
+  icon.style.background = isDark ? '#2a2a3a' : '#f0f0f0';
+}
+function saveNewPassword(){
+  var p1=document.getElementById('new-pass-1').value;
+  var p2=document.getElementById('new-pass-2').value;
+  if(!p1||p1.length<6){alert('Password must be at least 6 characters.');return;}
+  if(p1!==p2){alert('Passwords do not match. Please try again.');return;}
+  alert('Password changed successfully!');
+  goTo('login');
+}
+</script>
+</body>
+</html>
